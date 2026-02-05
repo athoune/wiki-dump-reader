@@ -3,7 +3,7 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 
-def iterate(reader) -> Generator[tuple[str | None, str], None, None]:
+def iterate(reader) -> Generator[tuple[str, str], None, None]:
     content: list[str] = []
     for line in reader:
         line: str = line.strip()
@@ -20,9 +20,9 @@ def iterate(reader) -> Generator[tuple[str | None, str], None, None]:
             if ns_elem.text is not None and ns_elem.text.strip() != "0":
                 continue
             title_elem: Element[str] | None = tree.find("title")
-            if title_elem is None:
+            if title_elem is None or title_elem.text is None:
                 continue
-            title: str | None = title_elem.text
+            title: str = title_elem.text
             text_elem: Element[str] | None = tree.find("revision/text")
             if text_elem is None:
                 continue
