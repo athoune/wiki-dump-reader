@@ -3,11 +3,6 @@ from typing import Generator
 from xml.parsers.expat import ParserCreate
 
 
-class Page:
-    title: str
-    text: str
-
-
 class Iterate:
     def __init__(self, reader) -> None:
         self.reader = reader
@@ -37,7 +32,7 @@ class Iterate:
             self.title_buffer.seek(0)
             self.ready.append(
                 (
-                    self.id_buffer.read(),
+                    # self.id_buffer.read(),
                     self.title_buffer.read(),
                     self.text_buffer.read(),
                 )
