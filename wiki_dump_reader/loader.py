@@ -5,14 +5,17 @@ from xml.etree.ElementTree import Element
 
 
 def iterate(reader) -> Generator[tuple[str, str], None, None]:
-    content = StringIO()
+    content = None
     for line in reader:
-        line: str = line.strip(" ")
-        if line == "<page>\n":
-            content = StringIO(line)
-        elif line == "</page>\n":
+        stripped: str = line.strip()
+        if stripped == "<page>":
+            content = StringIO()
             content.write(line)
+        elif stripped == "</page>":
+            content.write(stripped)
+            content.seek(0)
             tree: Element = ElementTree.fromstring(content.read())
+            content = None
             ns_elem: Element[str] | None = tree.find("ns")
             if ns_elem is None:
                 continue
@@ -30,4 +33,11 @@ def iterate(reader) -> Generator[tuple[str, str], None, None]:
                 continue
             yield title, text
         else:
-            content.write(line)
+            if content is not None:
+                content.write(line)
+
+if __name__ == "__main__":
+    import sys
+
+    for title, text in iterate(sys.stdin):
+        print(title)  # , "\n\t", text[:100])
