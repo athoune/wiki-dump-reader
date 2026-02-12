@@ -1,19 +1,18 @@
+from io import StringIO
 from typing import Generator
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 
 
 def iterate(reader) -> Generator[tuple[str, str], None, None]:
-    content: list[str] = []
+    content = StringIO()
     for line in reader:
-        line: str = line.strip()
-        if line == "<page>":
-            content = [line]
-        elif line == "</page>":
-            content.append(line)
-            content_txt: str = "\n".join(content)
-            tree: Element = ElementTree.fromstring(content_txt)
-            content_txt = ""
+        line: str = line.strip(" ")
+        if line == "<page>\n":
+            content = StringIO(line)
+        elif line == "</page>\n":
+            content.write(line)
+            tree: Element = ElementTree.fromstring(content.read())
             ns_elem: Element[str] | None = tree.find("ns")
             if ns_elem is None:
                 continue
@@ -31,5 +30,4 @@ def iterate(reader) -> Generator[tuple[str, str], None, None]:
                 continue
             yield title, text
         else:
-            if type(content) is list:
-                content.append(line)
+            content.write(line)
