@@ -53,15 +53,15 @@ class Iterate:
         if self.slugs == ["mediawiki", "page", "revision", "text"]:
             self.text_buffer.write(data)
 
-    def loop(self):
+    def loop(self, buffer_size=128000):
         while True:
-            chunk = self.reader.read(8192)
+            chunk = self.reader.read(buffer_size)
             self.parser.Parse(chunk)
             while len(self.ready) > 0:
                 yield self.ready.pop()
 
 
-def iterate(reader) -> Generator[str, None, None]:
+def iterate(reader, buffer_size=128000) -> Generator[tuple[str, str], None, None]:
     iterator = Iterate(reader)
     for page in iterator.loop():
         yield page
@@ -70,5 +70,5 @@ def iterate(reader) -> Generator[str, None, None]:
 if __name__ == "__main__":
     import sys
 
-    for id_, title, text in iterate(sys.stdin):
-        print(id_, title)  # , "\n\t", text[:100])
+    for title, text in iterate(sys.stdin):
+        print(title)  # , "\n\t", text[:100])
